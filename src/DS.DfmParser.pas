@@ -54,6 +54,7 @@ type
 
     function HasObject(const AName: string): Boolean;
     function GetObject(const AName: string; ARecursive: Boolean = False): TDfmObject;
+    function GetObjectsByClass(const AClassName: String; ARecursive: Boolean = False): TObjectList;
     procedure DeleteObject(const AName: string);
 
     property Owner: TDfmObject read FOwner;
@@ -170,6 +171,41 @@ begin
       if SameText(DfmObject.Name, AName) then
         Exit(DfmObject);
     Result := nil;
+  end;
+end;
+
+function TDfmObject.GetObjectsByClass(const AClassName: String; ARecursive: Boolean): TDfmObjects;
+
+  function Search(const DfmObjectParent: TDfmObject; const ClassName: String): TDfmObjects;
+  var
+    DfmChildObject: TDfmObject;
+    DfmObjects: TList<TDfmObject>;
+  begin
+    Result := TList<TDfmObject>.Create;
+
+    if SameText(DfmObjectParent.ClassName_, ClassName) then
+      Result.Add(DfmObjectParent);
+
+    for DfmChildObject in DfmObjectParent.Objects do
+    begin
+      DfmObjects := Search(DfmChildObject, ClassName);
+      Result.AddRange(DfmObjects.ToArray);
+      FreeAndNil(DfmObjects);
+    end;
+  end;
+
+var
+  DfmObject: TDfmObject;
+begin
+  if ARecursive then
+    Result := Search(Self, AClassName)
+  else
+  begin
+    Result := TDfmObjects.Create;
+
+    for DfmObject in Objects do
+      if SameText(DfmObject.ClassName_, AClassName) then
+        Result.Add(DfmObject);
   end;
 end;
 
