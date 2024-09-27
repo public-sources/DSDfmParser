@@ -8,6 +8,12 @@ uses
 type
   EDfmParseInvalidFormat = class(Exception);
 
+  TDfmProperty = class;
+  TDfmObject = class;
+
+  TDfmProperties = TObjectList<TDfmProperty>;
+  TDfmObjects = TObjectList<TDfmObject>;
+
   TDfmObjectType = (doObject, doInherited, doInline);
 
   TDfmProperty = class
@@ -29,12 +35,12 @@ type
     FBeginLine: Integer;
     FEndLine: Integer;
     FLevel: Integer;
-    FProperties: TObjectList<TDfmProperty>;
-    FObjects: TObjectList<TDfmObject>;
+    FProperties: TDfmProperties;
+    FObjects: TDfmObjects;
     FObjectType: TDfmObjectType;
     FClassSaved: string;
-    FPropertiesSaved: TObjectList<TDfmProperty>;
-    FObjectsSaved: TObjectList<TDfmObject>;
+    FPropertiesSaved: TDfmProperties;
+    FObjectsSaved: TDfmObjects;
     function GetPropertyObject(const AName: string): TDfmProperty;
   public
     constructor Create(const AOwner: TDfmObject; const AName: string);
@@ -58,8 +64,8 @@ type
     property Level: Integer read FLevel;
     property Id: Integer read FId write FId;
     property ObjectType: TDfmObjectType read FObjectType write FObjectType;
-    property Properties: TObjectList<TDfmProperty> read FProperties;
-    property Objects: TObjectList<TDfmObject> read FObjects;
+    property Properties: TDfmProperties read FProperties;
+    property Objects: TDfmObjects read FObjects;
   end;
 
   TDfmFile = class(TDfmObject)
@@ -96,10 +102,10 @@ begin
   FId := -1;
   if FOwner <> nil then
     FOwner.Objects.Add(Self);
-  FProperties := TObjectList<TDfmProperty>.Create(True);
-  FObjects := TObjectList<TDfmObject>.Create(True);
-  FPropertiesSaved := TObjectList<TDfmProperty>.Create;
-  FObjectsSaved := TObjectList<TDfmObject>.Create;
+  FProperties := TDfmProperties.Create(True);
+  FObjects := TDfmObjects.Create(True);
+  FPropertiesSaved := TDfmProperties.Create;
+  FObjectsSaved := TDfmObjects.Create;
 end;
 
 procedure TDfmObject.DeleteObject(const AName: String);
